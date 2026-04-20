@@ -89,6 +89,7 @@ interface CompetitorRank {
           <p class="description">Enterprise market intelligence and cross-platform performance metrics.</p>
         </div>
         <div class="global-actions">
+
            <div class="segmented-control">
                <button *ngFor="let range of dateRanges" 
                        [class.active]="activeRange === range"
@@ -102,6 +103,18 @@ interface CompetitorRank {
             </button>
         </div>
       </section>
+
+      <!-- NEW: VIEW TABS -->
+      <div class="main-view-tabs">
+        <button class="view-tab" [class.active]="activeTab === 'market'" (click)="setTab('market')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+          Market Intelligence
+        </button>
+        <button class="view-tab" [class.active]="activeTab === 'products'" (click)="setTab('products')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Products & Categories
+        </button>
+      </div>
 
       <!-- 2. KPI HERO BANNER -->
       <section class="kpi-banner-wrap">
@@ -129,7 +142,7 @@ interface CompetitorRank {
       </section>
 
       <!-- 3. REVENUE & MARGIN + DONUT -->
-      <section class="analysis-layout-grid">
+      <section class="analysis-layout-grid" [class.d-none]="activeTab !== 'products'">
         <!-- Main Chart -->
         <div class="panel-card chart-hero-panel">
           <div class="panel-header">
@@ -195,7 +208,7 @@ interface CompetitorRank {
       </section>
 
       <!-- 4. MARKET LEADERBOARD -->
-      <section class="panel-card full-span-card">
+      <section class="panel-card full-span-card" [class.d-none]="activeTab !== 'market'">
         <div class="panel-header space-between-center">
            <div class="stacked-title">
               <h3>Market Leaderboard</h3>
@@ -240,7 +253,7 @@ interface CompetitorRank {
       </section>
 
       <!-- 5. STATISTICAL CORRELATION -->
-      <section class="panel-card full-span-card">
+      <section class="panel-card full-span-card" [class.d-none]="activeTab !== 'market'">
          <div class="panel-header">
             <h3>Diagnostic Correlation Matrix</h3>
          </div>
@@ -295,7 +308,7 @@ interface CompetitorRank {
       </section>
 
       <!-- 6. MARKETPLACE TABLE -->
-      <section class="panel-card full-span-card">
+      <section class="panel-card full-span-card" [class.d-none]="activeTab !== 'market'">
          <div class="panel-header">
             <h3>Channel Performance Analysis</h3>
          </div>
@@ -347,7 +360,7 @@ interface CompetitorRank {
       </section>
 
       <!-- 7. VELOCITY LEADERS + AI INSIGHTS -->
-      <section class="two-column-bottom-section">
+      <section class="two-column-bottom-section" [class.d-none]="activeTab !== 'products'">
          <div class="panel-card">
             <div class="panel-header space-between-center">
                <div class="stacked-title">
@@ -473,7 +486,9 @@ interface CompetitorRank {
     </div>
   `,
   styles: [`
-    :host {
+    :host { display: block; }
+    .d-none { display: none !important; }
+    .analytics-page {
       --bg: var(--main-bg);
       --card-bg: var(--panel-bg);
       --border: rgba(255, 255, 255, 0.08); /* Making borders clearer in white as requested */
@@ -493,6 +508,17 @@ interface CompetitorRank {
       max-width: 1600px;
       margin: 0 auto;
     }
+
+    /* VIEW TABS */
+    .main-view-tabs { display: flex; gap: 32px; border-bottom: 1px solid var(--border); margin-bottom: -12px; padding-bottom: 0px; }
+    .view-tab {
+      background: none; border: none; font-size: 15px; font-weight: 600; color: var(--text-muted); cursor: pointer; padding: 0 0 16px 0; position: relative; transition: all 0.2s; display: flex; align-items: center; gap: 8px;
+    }
+    .view-tab svg { width: 18px; opacity: 0.7; }
+    .view-tab:hover { color: var(--text-main); }
+    .view-tab.active { color: var(--accent); }
+    .view-tab.active svg { opacity: 1; }
+    .view-tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 3px; background: var(--accent); border-radius: 3px 3px 0 0; }
 
     /* STANDARDIZED PANEL STYLES - Matching Overview Page */
     .panel-card { 
@@ -803,7 +829,13 @@ export class BusinessAnalyticsComponent implements OnInit, AfterViewInit, OnDest
   @ViewChildren('tableTrendCanvas') tableTrendCanvases!: QueryList<ElementRef<HTMLCanvasElement>>;
   @ViewChildren('skuTrendCanvas') skuTrendCanvases!: QueryList<ElementRef<HTMLCanvasElement>>;
 
+  activeTab: 'market' | 'products' = 'market';
   chartInstances: Chart[] = [];
+  
+  setTab(tab: 'market' | 'products') {
+    this.activeTab = tab;
+  }
+
   viewMode: 'Revenue' | 'Margin' | 'Both' = 'Both';
   activeRange = '30D';
   dateRanges = ['7D', '30D', '90D', '12M', 'Custom'];
@@ -818,7 +850,7 @@ export class BusinessAnalyticsComponent implements OnInit, AfterViewInit, OnDest
 
   categoryPricing = [
     { category: 'Electronics', avgPrice: 842.00, color: '#2563EB' },
-    { category: 'Cameras', avgPrice: 1240.00, color: '#8B5CF6' },
+    { category: 'Périphériques', avgPrice: 1240.00, color: '#8B5CF6' },
     { category: 'Audio', avgPrice: 299.00, color: '#10B981' },
     { category: 'Tablets', avgPrice: 650.00, color: '#F59E0B' },
     { category: 'Other', avgPrice: 120.00, color: '#94A3B8' }
@@ -854,7 +886,7 @@ export class BusinessAnalyticsComponent implements OnInit, AfterViewInit, OnDest
   ];
 
   topProducts: Product[] = [
-    { name: 'Sony Alpha a7 IV Mirrorless', revenue: 42500, margin: 24, image: '', history: [40, 42, 45, 43, 48, 52, 55] },
+    { name: 'Keychron Q1 Max Custom Keyboard', revenue: 42500, margin: 24, image: '', history: [40, 42, 45, 43, 48, 52, 55] },
     { name: 'Apple iPad Pro 12.9" M2', revenue: 38200, margin: 18, image: '', history: [35, 36, 38, 37, 39, 40, 38] },
     { name: 'Bose Ultra Headphones', revenue: 29400, margin: 32, image: '', history: [22, 25, 24, 28, 30, 32, 31] },
     { name: 'Nintendo Switch OLED', revenue: 24100, margin: 12, image: '', history: [18, 19, 21, 20, 22, 23, 24] },

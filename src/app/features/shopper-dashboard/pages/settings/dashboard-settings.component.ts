@@ -252,7 +252,7 @@ export class DashboardSettingsComponent {
     { name: 'Laptops', icon: '💻', selected: true },
     { name: 'Monitors', icon: '🖥️', selected: false },
     { name: 'Headphones', icon: '🎧', selected: true },
-    { name: 'Cameras', icon: '📷', selected: false },
+    { name: 'Périphériques', icon: '📷', selected: false },
     { name: 'Gaming', icon: '🎮', selected: true },
     { name: 'Tablets', icon: '📟', selected: false },
     { name: 'Components', icon: '🔌', selected: false }

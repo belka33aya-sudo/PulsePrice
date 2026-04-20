@@ -164,13 +164,13 @@ export class DealFeedComponent implements OnInit, OnDestroy {
     },
     {
       id: '9', type: 'price_drop', isFeatured: false,
-      category: 'Cameras', productName: 'Canon EOS R50',
-      headline: 'Canon R50 mirrorless camera at incredible discount',
-      image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400',
-      currentPrice: 549, originalPrice: 749,
-      savingsAmount: 200, savingsPercent: 27,
-      store: 'BestBuy', dealScore: 8.3,
-      upvotes: 92, isUpvoted: false, timeAgo: '10 hours ago'
+      category: 'Périphériques', productName: 'Logitech G Pro X',
+      headline: 'The world\'s best esports mouse at an all-time low price',
+      image: 'https://images.unsplash.com/photo-1629429464245-487019807575?w=400',
+      currentPrice: 129, originalPrice: 159,
+      savingsAmount: 30, savingsPercent: 19,
+      store: 'Amazon', dealScore: 9.3,
+      upvotes: 142, isUpvoted: false, timeAgo: '10 hours ago'
     },
     {
       id: '10', type: 'price_drop', isFeatured: false,
@@ -228,7 +228,7 @@ export class DealFeedComponent implements OnInit, OnDestroy {
     { name: 'Monitors', count: 42 },
     { name: 'Tablets', count: 58 },
     { name: 'Components', count: 112 },
-    { name: 'Cameras', count: 35 },
+    { name: 'Périphériques', count: 35 },
   ];
 
   ngOnInit() {

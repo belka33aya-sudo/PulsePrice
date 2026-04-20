@@ -145,7 +145,7 @@ export class LandingPageComponent implements OnInit, OnDestroy, AfterViewInit {
     { name: 'Laptops', image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200', link: 'laptops' },
     { name: 'Monitors', image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=200', link: 'monitors' },
     { name: 'Headphones', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200', link: 'headphones' },
-    { name: 'Cameras', image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=200', link: 'cameras' },
+    { name: 'Périphériques', image: '/home/aya/.gemini/antigravity/brain/62262f9d-2483-46d6-b4ab-3568bc10b454/peripherals_category_image_1775136446458.png', link: 'peripheriques' },
     { name: 'Gaming', image: 'https://images.unsplash.com/photo-1593118247619-e2d6f056869e?w=200', link: 'gaming' },
     { name: 'Tablets', image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=200', link: 'tablets' },
     { name: 'Components', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=200', link: 'components' }
@@ -221,7 +221,7 @@ export class LandingPageComponent implements OnInit, OnDestroy, AfterViewInit {
     { name: 'Laptops', icon: '💻', count: 850, slug: 'laptops' },
     { name: 'Headphones', icon: '🎧', count: 430, slug: 'headphones' },
     { name: 'Gaming', icon: '🎮', count: 620, slug: 'gaming' },
-    { name: 'Cameras', icon: '📷', count: 380, slug: 'cameras' },
+    { name: 'Périphériques', icon: '📷', count: 380, slug: 'peripheriques' },
     { name: 'Monitors', icon: '🖥️', count: 290, slug: 'monitors' },
     { name: 'Tablets', icon: '📟', count: 310, slug: 'tablets' },
     { name: 'Components', icon: '⚙️', count: 540, slug: 'components' },

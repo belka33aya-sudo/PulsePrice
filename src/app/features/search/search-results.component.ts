@@ -54,7 +54,7 @@ export class SearchResultsComponent implements OnInit {
   freeShipping = false;
   sortBy = 'Best Match';
 
-  categories = ['All', 'Smartphones', 'Laptops', 'Monitors', 'Headphones', 'Cameras', 'Gaming', 'Tablets', 'Components'];
+  categories = ['All', 'Smartphones', 'Laptops', 'Monitors', 'Headphones', 'Périphériques', 'Gaming', 'Tablets', 'Components'];
   stores = ['Amazon', 'eBay', 'AliExpress', 'Jumia', 'Walmart', 'BestBuy', 'Newegg'];
   
   private router = inject(Router);

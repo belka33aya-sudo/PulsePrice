@@ -548,7 +548,7 @@ export class BusinessOverviewComponent implements OnInit {
     { name: 'iPhone 15 Pro 256GB', category: 'Phones', image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200', yourPrice: 999, lowestComp: 949, margin: 24, status: 'risk', platform: 'BestBuy' },
     { name: 'Samsung Galaxy S24 Ultra', category: 'Phones', image: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=200', yourPrice: 1199, lowestComp: 1149, margin: 19, status: 'risk', platform: 'Walmart' },
     { name: 'iPad Air M2 64GB', category: 'Tablets', image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=200', yourPrice: 549, lowestComp: 599, margin: 31, status: 'healthy', platform: 'Amazon' },
-    { name: 'Canon EOS R8', category: 'Cameras', image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=200', yourPrice: 1299, lowestComp: 1199, margin: 8, status: 'critical', platform: 'Amazon' },
+    { name: 'Logitech G Pro X 2', category: 'Périphériques', image: 'https://images.unsplash.com/photo-1629429464245-487019807575?w=200', yourPrice: 129, lowestComp: 119, margin: 22, status: 'healthy', platform: 'Amazon' },
   ];
 
   marketMoves: MarketMove[] = [
@@ -560,7 +560,7 @@ export class BusinessOverviewComponent implements OnInit {
   ];
 
   insights: Insight[] = [
-    { product: 'Canon EOS R8', message: 'Margin at 8% — below your 15% floor. Competitor undercut by $100. Consider raising price or setting a floor alert.', type: 'risk', icon: 'M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z', link: '/business/alerts' },
+    { product: 'Logitech G Pro X 2', message: 'You\'re now $10 above the lowest price. Competitor dropped to $119. Review your dynamic pricing rule.', type: 'watch', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', link: '/business/catalog' },
     { product: 'Sony WH-1000XM5', message: 'You\'re now $20 above the lowest price after Sony\'s drop. Lower to $279 to recapture the #1 position on Amazon.', type: 'watch', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', link: '/business/catalog' },
     { product: 'iPad Air M2', message: 'Your price is $50 above the lowest competitor — but you\'re still #2. Healthy margin at 31%, no action needed.', type: 'win', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', link: '/business/catalog' },
     { product: 'MacBook Air M3', message: 'Amazon dropped price by $80. You\'re now overpriced by $65. Update your pricing to stay competitive.', type: 'risk', icon: 'M13 10V3L4 14h7v7l9-11h-7z', link: '/business/competitors' },
@@ -569,12 +569,12 @@ export class BusinessOverviewComponent implements OnInit {
   topOpps: TopOpp[] = [
     { name: 'Sony WH-1000XM5', category: 'Headphones', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300', opportunity: 78, action: 'Lower by $10 → capture #1', accentColor: '#10B981', accentBg: 'rgba(16,185,129,0.12)' },
     { name: 'iPad Air M2', category: 'Tablets', image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300', opportunity: 64, action: 'Add bundle to boost margin', accentColor: '#7C3AED', accentBg: 'rgba(124,58,237,0.12)' },
-    { name: 'Canon EOS R8', category: 'Cameras', image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=300', opportunity: 52, action: 'Set margin floor alert', accentColor: '#EF4444', accentBg: 'rgba(239,68,68,0.12)' },
+    { name: 'Keychron Q1 Max', category: 'Périphériques', image: 'https://images.unsplash.com/photo-1595225442460-394136278fc4?w=300', opportunity: 52, action: 'Set margin floor alert', accentColor: '#EF4444', accentBg: 'rgba(239,68,68,0.12)' },
     { name: 'MacBook Air M3', category: 'Laptops', image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300', opportunity: 45, action: 'Monitor Amazon — undercut $80', accentColor: '#F59E0B', accentBg: 'rgba(245,158,11,0.12)' },
   ];
 
   activeAlerts = [
-    { title: 'Canon EOS R8 — Critical', meta: 'Margin at 8% · below 15% floor', severity: 'critical', label: 'Critical' },
+    { title: 'Logitech G Pro X 2 — Watch', meta: 'Comp. undercut by $10 on Amazon', severity: 'risk', label: 'At Risk' },
     { title: 'iPhone 15 Pro 256GB', meta: 'Comp. undercut by $50 on BestBuy', severity: 'risk', label: 'At Risk' },
     { title: 'Samsung Galaxy S24 Ultra', meta: 'Margin squeezed to 19%', severity: 'risk', label: 'At Risk' },
   ];

@@ -59,7 +59,7 @@ interface CatalogItem {
             <option value="all">All Categories</option>
             <option value="Audio">Audio</option>
             <option value="Phones">Phones</option>
-            <option value="Cameras">Cameras</option>
+            <option value="Périphériques">Périphériques</option>
             <option value="Laptops">Laptops</option>
           </select>
           <select [(ngModel)]="statusFilter" class="filter-select">
@@ -484,7 +484,7 @@ export class CatalogTrackerComponent implements OnInit {
     { id: '2', name: 'iPhone 15 Pro 256GB Titanium', category: 'Phones', image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200', yourPrice: 999, lowestComp: 949, margin: 24, status: 'risk' },
     { id: '3', name: 'Samsung Galaxy S24 Ultra 512GB', category: 'Phones', image: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=200', yourPrice: 1199, lowestComp: 1149, margin: 19, status: 'risk' },
     { id: '4', name: 'MacBook Air M3 13-inch', category: 'Laptops', image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200', yourPrice: 1099, lowestComp: 1019, margin: 22, status: 'risk' },
-    { id: '5', name: 'Canon EOS R8 Mirrorless Body', category: 'Cameras', image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=200', yourPrice: 1299, lowestComp: 1199, margin: 8, status: 'critical' },
+    { id: '5', name: 'Keychron Q1 Max Mechanical Keyboard', category: 'Périphériques', image: 'https://images.unsplash.com/photo-1595225442460-394136278fc4?w=200', yourPrice: 199, lowestComp: 189, margin: 15, status: 'healthy' },
     { id: '6', name: 'iPad Air M2 64GB WiFi', category: 'Tablets', image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=200', yourPrice: 549, lowestComp: 599, margin: 31, status: 'healthy' }
   ];
 
