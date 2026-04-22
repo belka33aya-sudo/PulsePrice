@@ -10,8 +10,8 @@ interface Competitor {
   logo: string;
   logoUrl?: string;
   logoGrad: string;
-  winRate: number;
-  winRateTrend: number;
+  competitiveness: number;
+  competitivenessTrend: number;
   aggressiveness: 'High' | 'Medium' | 'Low';
   aggressionDescription: string;
   sparkColor: string;
@@ -100,8 +100,8 @@ interface Activity {
 
           <div class="card-stats">
             <div class="stat-block">
-              <span class="stat-label">YOUR WIN RATE</span>
-              <span class="stat-value win-rate">{{ competitor.winRate }}%</span>
+              <span class="stat-label">COMPETITIVENESS</span>
+              <span class="stat-value win-rate">{{ competitor.competitiveness }}%</span>
             </div>
           </div>
 
@@ -1282,13 +1282,13 @@ export class BusinessCompetitorScannerComponent implements OnInit, OnDestroy {
     { name: 'B&H Photo', domain: 'bhphotovideo.com' }
   ];
 
-  competitors: (Omit<Competitor, 'aggressionDescription' | 'history' | 'logoGrad' | 'winRateTrend' | 'lastUpdated'> & { aggression: string, sparklinePath: string, sparklineColor: string })[] = [];
+  competitors: (Omit<Competitor, 'aggressionDescription' | 'history' | 'logoGrad' | 'competitivenessTrend' | 'lastUpdated'> & { aggression: string, sparklinePath: string, sparklineColor: string })[] = [];
   filteredItems: (Matchup & { competitorPrices: { [key: string]: number | null } })[] = [];
   marketActivity: Activity[] = [];
   private _competitors: Competitor[] = [
-    { id: '1', name: 'BestBuy', logo: 'B', lastUpdated: '3 mins ago', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f5/Best_Buy_Logo.svg', logoGrad: 'linear-gradient(135deg, #0046BE, #003399)', winRate: 68.4, winRateTrend: 4.2, aggressiveness: 'High', aggressionDescription: 'Changed prices 42 times this week.', sparkColor: '#F47067', history: [50, 48, 49, 45, 42, 40, 38, 44, 46, 42, 38, 35], domain: 'bestbuy.com' },
-    { id: '2', name: 'Amazon', logo: 'a', lastUpdated: 'Just now', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg', logoGrad: 'linear-gradient(135deg, #FF9900, #F57C00)', winRate: 41.2, winRateTrend: -2.1, aggressiveness: 'High', aggressionDescription: 'Automated repricing active.', sparkColor: '#F47067', history: [45, 42, 40, 39, 39, 37, 35, 34, 30, 28, 26, 25], domain: 'amazon.com' },
-    { id: '3', name: 'Walmart', logo: 'W', lastUpdated: '12 mins ago', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/14/Walmart_Spark.svg', logoGrad: 'linear-gradient(135deg, #0071CE, #0056A3)', winRate: 82.1, winRateTrend: 0.5, aggressiveness: 'Medium', aggressionDescription: 'Moderate price changes.', sparkColor: '#C69026', history: [40, 41, 39, 42, 45, 46, 44, 47, 49, 48, 45, 44], domain: 'walmart.com' },
+    { id: '1', name: 'BestBuy', logo: 'B', lastUpdated: '3 mins ago', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f5/Best_Buy_Logo.svg', logoGrad: 'linear-gradient(135deg, #0046BE, #003399)', competitiveness: 68.4, competitivenessTrend: 4.2, aggressiveness: 'High', aggressionDescription: 'Changed prices 42 times this week.', sparkColor: '#F47067', history: [50, 48, 49, 45, 42, 40, 38, 44, 46, 42, 38, 35], domain: 'bestbuy.com' },
+    { id: '2', name: 'Amazon', logo: 'a', lastUpdated: 'Just now', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg', logoGrad: 'linear-gradient(135deg, #FF9900, #F57C00)', competitiveness: 41.2, competitivenessTrend: -2.1, aggressiveness: 'High', aggressionDescription: 'Automated repricing active.', sparkColor: '#F47067', history: [45, 42, 40, 39, 39, 37, 35, 34, 30, 28, 26, 25], domain: 'amazon.com' },
+    { id: '3', name: 'Walmart', logo: 'W', lastUpdated: '12 mins ago', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/14/Walmart_Spark.svg', logoGrad: 'linear-gradient(135deg, #0071CE, #0056A3)', competitiveness: 82.1, competitivenessTrend: 0.5, aggressiveness: 'Medium', aggressionDescription: 'Moderate price changes.', sparkColor: '#C69026', history: [40, 41, 39, 42, 45, 46, 44, 47, 49, 48, 45, 44], domain: 'walmart.com' },
   ];
 
   private _matchups: Matchup[] = [
@@ -1420,8 +1420,8 @@ export class BusinessCompetitorScannerComponent implements OnInit, OnDestroy {
       logo: this.selectedRival.name.charAt(0),
       lastUpdated: 'Just now',
       logoGrad: 'linear-gradient(135deg, #60A5FA, #3B82F6)',
-      winRate: 0,
-      winRateTrend: 0,
+      competitiveness: 0,
+      competitivenessTrend: 0,
       aggressiveness: 'Low',
       aggressionDescription: 'Newly added competitor.',
       sparkColor: '#3B82F6',

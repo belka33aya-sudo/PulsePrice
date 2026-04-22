@@ -40,8 +40,8 @@ interface TopOpp { name: string; category: string; image: string; opportunity: n
               <div class="stat-icon" [ngClass]="s.colorClass" [ngSwitch]="s.label">
                 <svg *ngSwitchCase="'Products Tracked'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
                 <svg *ngSwitchCase="'Competitors'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                <svg *ngSwitchCase="'Margin Alerts'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                <svg *ngSwitchCase="'Avg. Margin'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                <svg *ngSwitchCase="'Price Alerts'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <svg *ngSwitchCase="'Competitiveness'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
               </div>
               <div class="stat-info">
                 <span class="stat-label">{{ s.label }}</span>
@@ -58,7 +58,7 @@ interface TopOpp { name: string; category: string; image: string; opportunity: n
           <section class="content-panel">
             <div class="panel-header">
               <div class="title-wrap">
-                <h2>Margin Health</h2>
+                <h2>Market Health</h2>
                 <span class="live-indicator">
                   <span class="dot"></span> Live
                 </span>
@@ -71,10 +71,10 @@ interface TopOpp { name: string; category: string; image: string; opportunity: n
 
             <div class="product-table">
               <div class="product-header">
-                <span>Product</span>
+                <span>Catalog Item</span>
                 <span>Your Price</span>
                 <span>Lowest Comp.</span>
-                <span>Margin</span>
+                <span>Visibility</span>
                 <span>Status</span>
               </div>
               <div class="product-row" *ngFor="let s of products"
@@ -93,7 +93,7 @@ interface TopOpp { name: string; category: string; image: string; opportunity: n
                   <div class="margin-bar-track">
                     <div class="margin-bar-fill" [ngClass]="s.status" [style.width.%]="s.margin"></div>
                   </div>
-                  <span class="margin-label">{{ s.margin }}%</span>
+                  <span class="margin-label">{{ s.margin }}% Share</span>
                 </div>
                 <span class="status-badge" [ngClass]="s.status">
                   {{ s.status === 'healthy' ? '✓ Healthy' : s.status === 'risk' ? '⚠ At Risk' : '✗ Critical' }}
@@ -531,16 +531,16 @@ export class BusinessOverviewComponent implements OnInit {
   get subtitle(): string {
     const critical = this.products.filter(s => s.status === 'critical').length;
     const risk = this.products.filter(s => s.status === 'risk').length;
-    if (critical > 0) return `You have ${critical} critical product${critical > 1 ? 's' : ''} and ${risk} at-risk margin${risk > 1 ? 's' : ''} to review today.`;
-    if (risk > 0) return `${risk} product${risk > 1 ? 's need' : ' needs'} attention — competitor prices are undercutting your margins.`;
-    return 'All margins are healthy. Monitor your catalog and stay ahead of market moves.';
+    if (critical > 0) return `You have ${critical} critical product${critical > 1 ? 's' : ''} and ${risk} at-risk positions to review today.`;
+    if (risk > 0) return `${risk} product${risk > 1 ? 's need' : ' needs'} attention — competitor prices are undercutting your marketplace visibility.`;
+    return 'All prices are competitive. Monitor your catalog and stay ahead of market moves.';
   }
 
   stats: StatCard[] = [
     { icon: '', label: 'Products Tracked', value: 48, displayValue: 0, prefix: '', suffix: '', colorClass: 'blue' },
     { icon: '', label: 'Competitors', value: 7, displayValue: 0, prefix: '', suffix: '', colorClass: 'purple' },
-    { icon: '', label: 'Margin Alerts', value: 3, displayValue: 0, prefix: '', suffix: '', colorClass: 'red' },
-    { icon: '', label: 'Avg. Margin', value: 34, displayValue: 0, prefix: '', suffix: '%', colorClass: 'green' },
+    { icon: '', label: 'Price Alerts', value: 3, displayValue: 0, prefix: '', suffix: '', colorClass: 'red' },
+    { icon: '', label: 'Competitiveness', value: 84, displayValue: 0, prefix: '', suffix: '%', colorClass: 'green' },
   ];
 
   products: ProductRow[] = [
@@ -562,21 +562,21 @@ export class BusinessOverviewComponent implements OnInit {
   insights: Insight[] = [
     { product: 'Logitech G Pro X 2', message: 'You\'re now $10 above the lowest price. Competitor dropped to $119. Review your dynamic pricing rule.', type: 'watch', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', link: '/business/catalog' },
     { product: 'Sony WH-1000XM5', message: 'You\'re now $20 above the lowest price after Sony\'s drop. Lower to $279 to recapture the #1 position on Amazon.', type: 'watch', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', link: '/business/catalog' },
-    { product: 'iPad Air M2', message: 'Your price is $50 above the lowest competitor — but you\'re still #2. Healthy margin at 31%, no action needed.', type: 'win', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', link: '/business/catalog' },
+    { product: 'iPad Air M2', message: 'Your price is $50 above the lowest competitor — but you\'re still #2. Target visibility maintained.', type: 'win', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', link: '/business/catalog' },
     { product: 'MacBook Air M3', message: 'Amazon dropped price by $80. You\'re now overpriced by $65. Update your pricing to stay competitive.', type: 'risk', icon: 'M13 10V3L4 14h7v7l9-11h-7z', link: '/business/competitors' },
   ];
 
   topOpps: TopOpp[] = [
     { name: 'Sony WH-1000XM5', category: 'Headphones', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300', opportunity: 78, action: 'Lower by $10 → capture #1', accentColor: '#10B981', accentBg: 'rgba(16,185,129,0.12)' },
-    { name: 'iPad Air M2', category: 'Tablets', image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300', opportunity: 64, action: 'Add bundle to boost margin', accentColor: '#7C3AED', accentBg: 'rgba(124,58,237,0.12)' },
-    { name: 'Keychron Q1 Max', category: 'Périphériques', image: 'https://images.unsplash.com/photo-1595225442460-394136278fc4?w=300', opportunity: 52, action: 'Set margin floor alert', accentColor: '#EF4444', accentBg: 'rgba(239,68,68,0.12)' },
+    { name: 'iPad Air M2', category: 'Tablets', image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300', opportunity: 64, action: 'Bundle with accessories', accentColor: '#7C3AED', accentBg: 'rgba(124,58,237,0.12)' },
+    { name: 'Keychron Q1 Max', category: 'Périphériques', image: 'https://images.unsplash.com/photo-1595225442460-394136278fc4?w=300', opportunity: 52, action: 'Set price floor alert', accentColor: '#EF4444', accentBg: 'rgba(239,68,68,0.12)' },
     { name: 'MacBook Air M3', category: 'Laptops', image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300', opportunity: 45, action: 'Monitor Amazon — undercut $80', accentColor: '#F59E0B', accentBg: 'rgba(245,158,11,0.12)' },
   ];
 
   activeAlerts = [
-    { title: 'Logitech G Pro X 2 — Watch', meta: 'Comp. undercut by $10 on Amazon', severity: 'risk', label: 'At Risk' },
-    { title: 'iPhone 15 Pro 256GB', meta: 'Comp. undercut by $50 on BestBuy', severity: 'risk', label: 'At Risk' },
-    { title: 'Samsung Galaxy S24 Ultra', meta: 'Margin squeezed to 19%', severity: 'risk', label: 'At Risk' },
+    { title: 'Logitech G Pro X 2 — Watch', meta: 'Comp. undercut by $10 on Amazon', severity: 'risk', label: 'Price Risk' },
+    { title: 'iPhone 15 Pro 256GB', meta: 'Comp. undercut by $50 on BestBuy', severity: 'risk', label: 'Price Risk' },
+    { title: 'Samsung Galaxy S24 Ultra', meta: 'Market share dropped below 20%', severity: 'risk', label: 'Trend Loss' },
   ];
 
   ngOnInit() {

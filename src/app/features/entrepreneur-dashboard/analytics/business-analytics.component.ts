@@ -24,15 +24,15 @@ interface PlatformStat {
   logo: string;
   items: number;
   avgPrice: number;
-  winRate: number;
-  revenueShare: number;
+  visibilityScore: number;
+  marketShare: number;
   trend: number[];
 }
 
 interface Product {
   name: string;
-  revenue: number;
-  margin: number;
+  popularityScore: number;
+  visibility: number;
   image: string;
   history: number[];
 }
@@ -48,7 +48,7 @@ interface Insight {
 interface CompetitorRank {
   name: string;
   score: number;
-  winRate: number;
+  visibilityScore: number;
   avgPrice: number;
   skus: number;
   trend: 'up' | 'down' | 'stable';
@@ -117,7 +117,7 @@ interface CompetitorRank {
       </div>
 
       <!-- 2. KPI HERO BANNER -->
-      <section class="kpi-banner-wrap">
+      <section class="kpi-banner-wrap" [class.d-none]="activeTab !== 'market'">
         <div class="kpi-grid-refined">
           <div class="kpi-box-refined" *ngFor="let kpi of kpis">
              <div class="top-row">
@@ -141,67 +141,97 @@ interface CompetitorRank {
         </div>
       </section>
 
-      <!-- 3. REVENUE & MARGIN + DONUT -->
-      <section class="analysis-layout-grid" [class.d-none]="activeTab !== 'products'">
-        <!-- Main Chart -->
+      <!-- 3.1 DESCRIPTIVE STATS & BAR CHART (PRODUCTS TAB) -->
+      <section class="analysis-layout-grid" [class.d-none]="activeTab !== 'products'" style="grid-template-columns: 1fr 1fr;">
+        <!-- Avg Price by Category & Platform Chart -->
         <div class="panel-card chart-hero-panel">
           <div class="panel-header">
              <div class="title-meta-stack">
-                <h3>Revenue & Margin Trends</h3>
-                <div class="chart-summary-badges">
-                   <div class="s-badge revenue">
-                      <span class="s-label">Total Revenue</span>
-                      <span class="s-val">$284.9k</span>
-                   </div>
-                   <div class="s-badge margin">
-                      <span class="s-label">Avg Margin</span>
-                      <span class="s-val">34.2%</span>
-                   </div>
-                </div>
-             </div>
-             <div class="view-mode-pill">
-                <button [class.p-active]="viewMode === 'Revenue'" (click)="updateViewMode('Revenue')">Revenue</button>
-                <button [class.p-active]="viewMode === 'Margin'" (click)="updateViewMode('Margin')">Margin</button>
-                <button [class.p-active]="viewMode === 'Both'" (click)="updateViewMode('Both')">Unified</button>
+                <h3>Average Price by Category & Platform</h3>
+                <p class="subtitle-muted">Which platform is cheapest per category?</p>
              </div>
           </div>
-          <div class="panel-body chart-height-fixed professional-chart-wrap">
-             <canvas #revenueMarginCanvas></canvas>
-             <!-- CUSTOM TOOLTIP CONTAINER (Optional Placeholder for High-End Interaction) -->
+          <div class="panel-body chart-height-fixed professional-chart-wrap" style="height: 420px;">
+             <canvas #groupedBarCanvas></canvas>
           </div>
-          <div class="panel-footer-legend">
-             <div class="legend-pill">
-                <span class="legend-dot" style="background: rgba(59, 130, 246, 0.7)"></span>
-                Gross Revenue (USD)
+        </div>
+
+        <!-- Descriptive Statistics Table -->
+        <div class="panel-card category-side-panel">
+           <div class="panel-header">
+              <div class="title-meta-stack">
+                 <h3>Descriptive Statistics by Category</h3>
+                 <p class="subtitle-muted">Last 30 days across all platforms</p>
+              </div>
+           </div>
+           <div class="table-container-scroll" style="margin-top: 10px;">
+              <table class="data-table-premium ttest-table compact-table">
+                 <thead>
+                    <tr>
+                       <th class="l-align">CATEGORY</th>
+                       <th>MEAN</th>
+                       <th>MEDIAN</th>
+                       <th>STD DEV</th>
+                       <th>MIN</th>
+                       <th>MAX</th>
+                    </tr>
+                 </thead>
+                 <tbody>
+                    <tr *ngFor="let stat of descriptiveStats">
+                       <td class="l-align"><strong>{{ stat.category }}</strong></td>
+                       <td class="tabular-nums">{{ stat.mean | currency:'USD':'symbol':'1.0-0' }}</td>
+                       <td class="tabular-nums">{{ stat.median | currency:'USD':'symbol':'1.0-0' }}</td>
+                       <td class="tabular-nums font-weight-700" [style.color]="getStdDevColor(stat.stdDev)">{{ stat.stdDev | currency:'USD':'symbol':'1.0-0' }}</td>
+                       <td class="tabular-nums font-weight-700" style="color: var(--success)">{{ stat.min | currency:'USD':'symbol':'1.0-0' }}</td>
+                       <td class="tabular-nums font-weight-700" style="color: var(--danger)">{{ stat.max | currency:'USD':'symbol':'1.0-0' }}</td>
+                    </tr>
+                 </tbody>
+              </table>
+           </div>
+        </div>
+      </section>
+
+      <!-- 3.2 REGRESSION & CORRELATION (PRODUCTS TAB) -->
+      <section class="analysis-layout-grid" [class.d-none]="activeTab !== 'products'" style="margin-top: 24px; grid-template-columns: 1.8fr 1fr;">
+        <!-- Regression Scatter -->
+        <div class="panel-card chart-hero-panel">
+          <div class="panel-header">
+             <div class="title-meta-stack">
+                <h3>Scatter Plot with Regression Line: Product Rating vs. Price (USD)</h3>
              </div>
-             <div class="legend-pill">
-                <span class="legend-line" style="background: #10B981"></span>
-                Profit Margin (%)
+          </div>
+          <div class="panel-body chart-height-fixed professional-chart-wrap" style="height: 380px;">
+             <canvas #scatterRegressionCanvas></canvas>
+             <div class="r2-annotation">
+               <strong>R² annotation on chart:</strong>
+               <span>Rating explains 18% of price variation</span>
              </div>
           </div>
         </div>
 
-        <!-- Category Pricing -->
+        <!-- Correlation Matrix Products -->
         <div class="panel-card category-side-panel">
            <div class="panel-header">
-              <h3>Avg. Price / Category</h3>
-           </div>
-           <div class="panel-body">
-              <div class="donut-hero-container">
-                 <canvas #avgPriceCategoryCanvas></canvas>
-                 <div class="donut-center-meta">
-                    <span class="center-val">$842</span>
-                    <span class="center-sub">AVERAGE</span>
-                 </div>
+              <div class="title-meta-stack">
+                 <h3>Correlation Matrix</h3>
+                 <p class="subtitle-muted">Pearson r — price vs rating vs reviews</p>
               </div>
-              <div class="category-legend-stack">
-                 <div class="legend-item-row" *ngFor="let cat of categoryPricing">
-                    <div class="legend-key">
-                       <span class="legend-color-dot" [style.background-color]="cat.color"></span>
-                       {{ cat.category }}
+           </div>
+           <div class="panel-body" style="display:flex; justify-content:center; align-items:center; height: 100%; min-height: 300px;">
+              <div class="prod-correlation-grid">
+                 <!-- Header Row -->
+                 <div class="header-cell"></div>
+                 <div class="header-cell" *ngFor="let label of prodCorrelationLabels">{{ label }}</div>
+
+                 <!-- Data Rows -->
+                 <ng-container *ngFor="let row of prodCorrelationData; let i = index">
+                    <div class="header-cell side">{{ prodCorrelationLabels[i] }}</div>
+                    <div class="data-cell" *ngFor="let val of row" 
+                         [style.background-color]="getProdCorrelationBg(val)"
+                         [style.color]="getProdCorrelationText(val)">
+                       {{ val > 0 ? (val === 1 ? '1.00' : (val | number:'1.2-2')) : (val | number:'1.2-2') }}
                     </div>
-                    <span class="legend-val tabular-nums">{{ cat.avgPrice | currency }}</span>
-                 </div>
+                 </ng-container>
               </div>
            </div>
         </div>
@@ -231,16 +261,16 @@ interface CompetitorRank {
                           {{ r.trend === 'up' ? '↑' : (r.trend === 'down' ? '↓' : '→') }}
                        </span>
                     </div>
-                    <span class="score-cap">Win Score</span>
+                    <span class="score-cap">Competitiveness</span>
                  </div>
                  <div class="comp-stats-grid">
                     <div class="m-stat">
-                       <span class="m-label">WIN</span>
-                       <span class="m-value">{{ r.winRate }}%</span>
+                       <span class="m-label">VISIBILITY</span>
+                       <span class="m-value">{{ r.visibilityScore }}%</span>
                     </div>
                     <div class="m-sep"></div>
                     <div class="m-stat">
-                       <span class="m-label">PRICE</span>
+                       <span class="m-label">AVG PRICE</span>
                        <span class="m-value">{{ r.avgPrice | currency }}</span>
                     </div>
                  </div>
@@ -249,6 +279,97 @@ interface CompetitorRank {
                  </div>
               </div>
            </div>
+        </div>
+      </section>
+
+      <!-- 4.1 PRICE GAP HEATMAP -->
+      <section class="panel-card full-span-card" [class.d-none]="activeTab !== 'market'">
+        <div class="panel-header">
+          <div class="stacked-title">
+            <h3>Price Gap Heatmap — Vendor vs Each Competitor</h3>
+            <p class="subtitle-muted">Detailed price disparity across categories and platforms.</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="heatmap-table-container">
+            <table class="heatmap-table">
+              <thead>
+                <tr>
+                  <th class="sticky-col">Category</th>
+                  <th *ngFor="let comp of priceGapHeatmap.competitors">{{ comp }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let cat of priceGapHeatmap.categories">
+                  <td class="sticky-col cat-name-cell">{{ cat.name }}</td>
+                  <td *ngFor="let gap of cat.gaps; let i = index">
+                    <div class="heatmap-cell" [style.background-color]="getHeatmapColor(gap)">
+                      <div class="heat-dot" [style.background-color]="getHeatmapDotColor(gap)" [style.color]="getHeatmapDotColor(gap)"></div>
+                      <span class="gap-val" [style.color]="getHeatmapTextColor(gap)">{{ gap > 0 ? '+' : '' }}{{ gap | currency }}</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="heatmap-legend">
+            <div class="legend-entry">
+              <span class="heat-dot" style="background-color: #5B9D70; color: #5B9D70;"></span>
+              <span>Sage = vendor is cheaper</span>
+            </div>
+            <div class="legend-entry">
+              <span class="heat-dot" style="background-color: #D86A58; color: #D86A58;"></span>
+              <span>Terracotta = competitor is cheaper</span>
+            </div>
+            <div class="legend-entry">
+              <span class="heat-dot" style="background-color: rgba(168, 162, 158, 0.6); color: rgba(168, 162, 158, 0.6);"></span>
+              <span>Neutral = price parity</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4.2 CATEGORY-LEVEL T-TEST -->
+      <section class="panel-card full-span-card" [class.d-none]="activeTab !== 'market'">
+        <div class="panel-header">
+          <div class="stacked-title">
+            <h3>Category-Level t-test Results</h3>
+            <p class="subtitle-muted">Statistical significance of price differences vs market average.</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="table-container-scroll">
+            <table class="data-table-premium ttest-table">
+              <thead>
+                <tr>
+                  <th class="l-align">Category</th>
+                  <th>My avg price</th>
+                  <th>Market avg</th>
+                  <th>Gap</th>
+                  <th>p-value</th>
+                  <th>Verdict</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let res of ttestResults">
+                  <td class="l-align"><strong>{{ res.category }}</strong></td>
+                  <td class="tabular-nums">{{ res.myPrice | currency }}</td>
+                  <td class="tabular-nums">{{ res.marketPrice | currency }}</td>
+                  <td class="tabular-nums" [style.color]="res.gap > 0 ? 'var(--danger)' : 'var(--success)'">
+                    {{ res.gap > 0 ? '+' : '' }}{{ res.gap | currency }}
+                  </td>
+                  <td class="tabular-nums font-weight-700">{{ res.pValue }}</td>
+                  <td>
+                    <div class="verdict-pill" [class.sig]="res.significant" [class.expensive]="res.expensive">
+                      <svg *ngIf="res.significant" class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <svg *ngIf="!res.significant" class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                      <span>{{ res.verdict }}</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -319,8 +440,8 @@ interface CompetitorRank {
                      <th class="l-align">Channel</th>
                      <th>Catalog</th>
                      <th>Avg Unit Price</th>
-                     <th>Win Chance</th>
-                     <th>Revenue Distribution</th>
+                     <th>Visibility</th>
+                     <th>Market Share</th>
                      <th>Volatility</th>
                   </tr>
                </thead>
@@ -336,16 +457,16 @@ interface CompetitorRank {
                      <td class="tabular-nums font-weight-700">{{ p.avgPrice | currency }}</td>
                      <td>
                         <div class="win-chance-row">
-                           <div class="chance-track-base"><div class="chance-fill-active" [style.width.%]="p.winRate" [style.background-color]="getWinRateColorByValue(p.winRate)"></div></div>
-                           <span class="tabular-nums txt-tiny">{{ p.winRate }}%</span>
+                           <div class="chance-track-base"><div class="chance-fill-active" [style.width.%]="p.visibilityScore" [style.background-color]="getScoreColorByValue(p.visibilityScore)"></div></div>
+                           <span class="tabular-nums txt-tiny">{{ p.visibilityScore }}%</span>
                         </div>
                      </td>
                      <td>
                         <div class="share-distribution-row">
                            <div class="distribution-track-wide">
-                              <div class="distribution-fill-wide" [style.width.%]="p.revenueShare" [style.background-color]="getPlatformColor(p.name)"></div>
+                              <div class="distribution-fill-wide" [style.width.%]="p.marketShare" [style.background-color]="getPlatformColor(p.name)"></div>
                            </div>
-                           <span class="tabular-nums txt-tiny">{{ p.revenueShare }}%</span>
+                           <span class="tabular-nums txt-tiny">{{ p.marketShare }}%</span>
                         </div>
                      </td>
                      <td>
@@ -359,42 +480,15 @@ interface CompetitorRank {
          </div>
       </section>
 
-      <!-- 7. VELOCITY LEADERS + AI INSIGHTS -->
-      <section class="two-column-bottom-section" [class.d-none]="activeTab !== 'products'">
-         <div class="panel-card">
-            <div class="panel-header space-between-center">
-               <div class="stacked-title">
-                  <h3>Catalog Velocity Leaders</h3>
-                  <p class="subtitle-muted">Top performing items by daily revenue flow.</p>
-               </div>
-               <button class="link-btn-text">View All →</button>
-            </div>
-            <div class="velocity-stack-compact">
-               <div class="product-row-velocity" *ngFor="let product of topProducts; let i = index">
-                  <span class="velocity-rank-pill">{{ i+1 }}</span>
-                  <div class="product-char-avatar">{{ product.name.charAt(0) }}</div>
-                  <div class="product-info-column">
-                     <span class="p-name-main">{{ product.name }}</span>
-                     <span class="p-cat-sub">Market Category</span>
-                  </div>
-                  <div class="product-stats-group-end">
-                     <div class="p-rev-val tabular-nums">{{ product.revenue | currency }}</div>
-                     <span class="p-mgn-pill-label" [class]="getMarginClass(product.margin)">{{ product.margin }}% Margin</span>
-                  </div>
-                  <div class="p-spark-wrap-end">
-                     <canvas class="canvas-spark-sku" #skuTrendCanvas></canvas>
-                  </div>
-               </div>
+      <!-- 7. STATISTICAL SIGNIFICANCE (PRODUCTS TAB) -->
+      <section class="panel-card full-span-card" style="margin-top: 24px;" [class.d-none]="activeTab !== 'products'">
+         <div class="panel-header">
+            <div class="stats-header-group">
+               <div class="stats-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg></div>
+               <h3>Statistical Significance & Reliability</h3>
             </div>
          </div>
-
-         <div class="panel-card stats-accents-panel">
-            <div class="panel-header">
-               <div class="stats-header-group">
-                  <div class="stats-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg></div>
-                  <h3>Statistical Significance & Reliability</h3>
-               </div>
-            </div>
+         <div class="panel-body" style="padding: 24px;">
             <div class="stats-feed-vertical">
                <div class="stats-card-insight" *ngFor="let insight of insights" [style.border-left-color]="getInsightColor(insight.type)">
                   <div class="stats-card-meta-top">
@@ -495,6 +589,8 @@ interface CompetitorRank {
       --text-main: var(--text-primary);
       --text-muted: var(--text-secondary);
       --accent: var(--accent-blue);
+      --h-green: #10b981;
+      --h-red: #e11d48;
       display: block;
       width: 100%;
       background: var(--bg);
@@ -561,6 +657,10 @@ interface CompetitorRank {
        grid-template-columns: repeat(5, 1fr); 
        gap: 16px; 
     }
+    .kpi-grid-refined.market-grid {
+       grid-template-columns: repeat(3, 1fr);
+       max-width: 900px;
+    }
     .kpi-box-refined { 
        background: var(--card-bg); 
        border: 1px solid var(--border);
@@ -581,13 +681,13 @@ interface CompetitorRank {
     .comparison-text { font-size: 11px; font-weight: 600; }
     .mini-spark-container { width: 50px; height: 18px; position: relative; }
 
-    /* REVENUE & MARGIN ENHANCEMENTS */
+    /* PRICE PERFORMANCE ENHANCEMENTS */
     .title-meta-stack { display: flex; flex-direction: column; gap: 12px; }
     .chart-summary-badges { display: flex; gap: 16px; align-items: center; }
     .s-badge { display: flex; flex-direction: column; gap: 2px; padding: 4px 16px; border-radius: 8px; border-left: 3px solid transparent; background: rgba(0,0,0,0.02); }
     :host-context(html:not(.light-mode)) .s-badge { background: rgba(255,255,255,0.03); }
-    .s-badge.revenue { border-left-color: var(--accent); }
-    .s-badge.margin { border-left-color: var(--success); }
+    .performance-badge { border-left-color: var(--accent); }
+    .s-badge.visibility { border-left-color: var(--success); }
     .s-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
     .s-val { font-size: 15px; font-weight: 800; color: var(--text-main); }
     .professional-chart-wrap { position: relative; padding-top: 10px; }
@@ -666,6 +766,16 @@ interface CompetitorRank {
     .bar-track { width: 100%; height: 5px; background: var(--border); border-radius: 10px; overflow: hidden; }
     .bar-fill { height: 100%; transition: width 0.6s ease-out; }
 
+    .r2-annotation { position: absolute; top: 24px; right: 24px; text-align: left; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); padding: 18px 22px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); color: white; font-size: 13px; z-index: 10; pointer-events: none; }
+    :host-context(html.light-mode) .r2-annotation { background: rgba(255,255,255,0.95); color: #1e293b; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 12px 35px rgba(0,0,0,0.08); }
+    .r2-annotation strong { font-weight: 800; display:block; margin-bottom: 8px; font-size: 14px; }
+    
+    .prod-correlation-grid { display: grid; grid-template-columns: 80px 1fr 1fr 1fr; gap: 10px; width: 100%; max-width: 440px; align-items: center; justify-content: center; margin-bottom: 40px; }
+    .header-cell { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; text-align: center; align-self: flex-end; padding-bottom: 6px; letter-spacing: 0.05em; }
+    .header-cell.side { text-align: left; align-self: center; padding-bottom: 0; padding-right: 12px; font-size: 12px; }
+    .data-cell { height: 68px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 16px; font-weight: 800; transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: default; }
+    .data-cell:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
     /* STATISTICAL CORRELATION */
     .correlation-view-split { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
     .section-title-box { margin-bottom: 32px; }
@@ -699,11 +809,14 @@ interface CompetitorRank {
     .insight-detail-txt { font-size: 13px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
 
     /* TABLE ANALYSIS */
-    .table-container-scroll { width: 100%; border-radius: 0 0 16px 16px; overflow: hidden; }
-    .data-table-premium { width: 100%; border-collapse: collapse; }
+    .table-container-scroll { width: 100%; border-radius: 0 0 16px 16px; overflow: hidden; overflow-x: auto; }
+    .data-table-premium { width: 100%; border-collapse: collapse; white-space: nowrap; }
     .data-table-premium th { text-align: right; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; padding: 18px 32px; border-bottom: 2px solid var(--border); background: rgba(0,0,0,0.01); }
     .data-table-premium td { padding: 20px 32px; border-bottom: 1px solid var(--border); text-align: right; color: var(--text-main); font-size: 14px; font-weight: 600; }
     .data-table-premium tr:hover td { background: rgba(0,0,0,0.01); }
+    :host-context(html:not(.light-mode)) .data-table-premium tr:hover td { background: rgba(255,255,255,0.02); }
+    .compact-table th { padding: 14px 16px; font-size: 10px; }
+    .compact-table td { padding: 14px 16px; font-size: 13px; }
     .l-align { text-align: left !important; }
     .channel-identity { display: flex; align-items: center; gap: 14px; }
     .channel-avatar-box { width: 44px; height: 44px; background: var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; color: var(--accent); }
@@ -818,12 +931,72 @@ interface CompetitorRank {
     .btn-save svg { width: 18px; transition: transform 0.2s; }
     .btn-save:hover svg { transform: translateX(4px); }
 
+    /* HEATMAP TABLE */
+    .heatmap-table-container { width: 100%; overflow-x: auto; margin-bottom: 24px; }
+    .heatmap-table { width: 100%; border-collapse: separate; border-spacing: 8px; }
+    .heatmap-table th { 
+      padding: 16px 12px; 
+      font-size: 10px; 
+      font-weight: 800; 
+      color: var(--text-muted); 
+      text-transform: uppercase; 
+      text-align: center; 
+      letter-spacing: 0.1em;
+    }
+    .heatmap-table td { min-width: 130px; }
+    .sticky-col { 
+      position: sticky; 
+      left: 0; 
+      background: var(--card-bg); 
+      z-index: 5; 
+      text-align: left !important; 
+      width: 120px;
+      padding-right: 20px;
+      border-right: 1px solid var(--border);
+    }
+    .cat-name-cell { font-weight: 800; color: var(--text-main); font-size: 13px; text-transform: uppercase; letter-spacing: 0.02em; }
+    
+    .heatmap-cell {
+      height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 0 16px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor: default;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      background: rgba(0,0,0,0.02);
+    }
+    .heatmap-cell:hover { 
+      transform: translateY(-2px) scale(1.02); 
+      box-shadow: 0 12px 24px rgba(0,0,0,0.1), inset 0 0 12px rgba(255, 255, 255, 0.05);
+      z-index: 10;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    .heat-dot { 
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; 
+      box-shadow: 0 0 10px currentColor; /* glow effect based on dot color */
+    }
+    .gap-val { 
+      font-size: 15px; font-weight: 800; letter-spacing: -0.02em; 
+      /* Clean, modern text without forced white/shadows */
+    }
+    
+    .heatmap-legend { display: flex; gap: 32px; padding: 0 8px; }
+    .legend-entry { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+
+    /* T-TEST RESULTS */
+    .ttest-table th { text-align: center; }
+    .ttest-table td { text-align: center; }
+    .verdict-pill {
+      display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 100px; 
+      background: rgba(255,255,255,0.05); font-size: 12px; font-weight: 700; color: var(--text-muted);
+    }
+    .verdict-pill.sig { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .verdict-pill.sig.expensive { background: rgba(225, 29, 72, 0.15); color: #fb7185; }
+    .v-icon { width: 14px; height: 14px; }
+
     @media (max-width: 1400px) { .analysis-layout-grid, .two-column-bottom-section, .correlation-view-split, .competitors-tiles-row { grid-template-columns: 1fr; } .kpi-grid-refined { grid-template-columns: repeat(3, 1fr); } }
   `],
 })
 export class BusinessAnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('revenueMarginCanvas') revenueMarginCanvas!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('avgPriceCategoryCanvas') avgPriceCategoryCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('groupedBarCanvas') groupedBarCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('scatterRegressionCanvas') scatterRegressionCanvas!: ElementRef<HTMLCanvasElement>;
   
   @ViewChildren('sparklineCanvas') sparklineCanvases!: QueryList<ElementRef<HTMLCanvasElement>>;
   @ViewChildren('tableTrendCanvas') tableTrendCanvases!: QueryList<ElementRef<HTMLCanvasElement>>;
@@ -834,17 +1007,18 @@ export class BusinessAnalyticsComponent implements OnInit, AfterViewInit, OnDest
   
   setTab(tab: 'market' | 'products') {
     this.activeTab = tab;
+    setTimeout(() => this.initAllCharts(), 50);
   }
 
-  viewMode: 'Revenue' | 'Margin' | 'Both' = 'Both';
+  viewMode: 'Price' | 'Stock' | 'Both' = 'Both';
   activeRange = '30D';
   dateRanges = ['7D', '30D', '90D', '12M', 'Custom'];
 
   kpis: KPI[] = [
-    { label: 'Total Revenue', value: '$284,920', delta: '+12.4%', isPositive: true, color: '#10B981', trend: [30, 45, 38, 52, 48, 65, 78] },
-    { label: 'Avg. Margin', value: '34.2%', delta: '-1.8%', isPositive: false, color: '#F59E0B', trend: [40, 38, 39, 35, 36, 34, 34] },
+    { label: 'Market Visibility', value: '84.2%', delta: '+12.4%', isPositive: true, color: '#3B82F6', trend: [30, 45, 38, 52, 48, 65, 78] },
+    { label: 'Price Volatility', value: '12.4%', delta: '-1.8%', isPositive: false, color: '#F59E0B', trend: [40, 38, 39, 35, 36, 34, 34] },
     { label: 'Total Products', value: '487', delta: '+23', isPositive: true, color: '#3B82F6', trend: [400, 410, 425, 430, 450, 470, 487] },
-    { label: 'Win Rate', value: '68.4%', delta: '+4.2%', isPositive: true, color: '#10B981', trend: [60, 62, 61, 65, 64, 67, 68] },
+    { label: 'Search Index', value: '742', delta: '+4.2%', isPositive: true, color: '#10B981', trend: [60, 62, 61, 65, 64, 67, 68] },
     { label: 'Market Vol', value: '142', delta: 'High', isPositive: false, color: '#EF4444', trend: [110, 130, 95, 150, 140, 160, 142] }
   ];
 
@@ -865,37 +1039,77 @@ export class BusinessAnalyticsComponent implements OnInit, AfterViewInit, OnDest
     [0.12, -0.1, 0.05, -0.3, 1.0]
   ];
 
+  descriptiveStats = [
+    { category: 'GPU', mean: 1641, median: 1599, stdDev: 210, min: 389, max: 2199 },
+    { category: 'Laptop', mean: 891, median: 849, stdDev: 143, min: 399, max: 3499 },
+    { category: 'Smartphone', mean: 748, median: 729, stdDev: 89, min: 199, max: 1299 },
+    { category: 'CPU', mean: 412, median: 389, stdDev: 61, min: 89, max: 749 },
+    { category: 'RAM', mean: 94, median: 89, stdDev: 18, min: 34, max: 289 },
+    { category: 'SSD', mean: 112, median: 99, stdDev: 12, min: 39, max: 499 }
+  ];
+
+  prodCorrelationLabels = ['Price', 'Rating', 'Reviews'];
+  prodCorrelationData = [
+    [1.00, -0.43, -0.21],
+    [-0.43, 1.00, 0.67],
+    [-0.21, 0.67, 1.00]
+  ];
+  
+  groupedBarData = {
+    labels: ['GPU', 'CPU', 'Laptop', 'Phone', 'RAM', 'SSD'],
+    newegg: [1580, 400, 870, 720, 90, 110],
+    bestbuy: [1700, 420, 910, 750, 95, 120],
+    jumia: [1820, 440, 940, 780, 100, 130] // Data mimicking the visualization
+  };
+
   correlationInsights = [
-    { label: 'Price ↔ Volume', explanation: 'Current elasticity suggests higher prices reduce volume by ~18% in electronics.', color: '#3B82F6' },
-    { label: 'Margin ↔ Win Rate', explanation: 'Maintaining competitive margins correlates with +12% win rate on Amazon.', color: '#10B981' },
-    { label: 'Volume ↔ Margin', explanation: 'High-velocity SKUs currently operate at 8% lower than average margins.', color: '#F87171' },
-    { label: 'Win Rate ↔ Position', explanation: 'Organic search rank 1-3 significantly boosts win rate probability by 40%.', color: '#3B82F6' }
+    { label: 'Price ↔ Volume', explanation: 'Current elasticity suggests price changes influence market share by ~18% in electronics.', color: '#3B82F6' },
+    { label: 'Position ↔ Visibility', explanation: 'Maintaining competitive pricing correlates with +12% share of voice on Amazon.', color: '#10B981' },
+    { label: 'Volume ↔ Stock', explanation: 'High-visibility SKUs currently operate at 8% higher than average stock availability.', color: '#F87171' },
+    { label: 'Visibility ↔ Rank', explanation: 'Organic search rank 1-3 significantly boosts visibility probability by 40%.', color: '#3B82F6' }
   ];
 
   competitorRanks: CompetitorRank[] = [
-    { name: 'BestBuy Global', score: 942, winRate: 74, avgPrice: 842, skus: 124, trend: 'up', color: '#fbbf24' },
-    { name: 'Amazon Warehouse', score: 885, winRate: 42, avgPrice: 855, skus: 412, trend: 'stable', color: '#3b82f6' },
-    { name: 'Walmart Inc', score: 812, winRate: 61, avgPrice: 838, skus: 288, trend: 'down', color: '#f59e0b' },
-    { name: 'ElectroHub Retail', score: 760, winRate: 55, avgPrice: 799, skus: 95, trend: 'up', color: '#64748b' }
+    { name: 'BestBuy Global', score: 942, visibilityScore: 74, avgPrice: 842, skus: 124, trend: 'up', color: '#fbbf24' },
+    { name: 'Amazon Warehouse', score: 885, visibilityScore: 42, avgPrice: 855, skus: 412, trend: 'stable', color: '#3b82f6' },
+    { name: 'Walmart Inc', score: 812, visibilityScore: 61, avgPrice: 838, skus: 288, trend: 'down', color: '#f59e0b' },
+    { name: 'ElectroHub Retail', score: 760, visibilityScore: 55, avgPrice: 799, skus: 95, trend: 'up', color: '#64748b' }
   ];
 
   platformStats: PlatformStat[] = [
-    { name: 'BestBuy', logo: '', items: 342, avgPrice: 842.20, winRate: 74, revenueShare: 45, trend: [65, 68, 70, 72, 74, 73, 74] },
-    { name: 'Amazon', logo: '', items: 412, avgPrice: 855.40, winRate: 42, revenueShare: 32, trend: [40, 41, 40, 42, 43, 41, 42] },
-    { name: 'Walmart', logo: '', items: 288, avgPrice: 838.00, winRate: 61, revenueShare: 23, trend: [58, 59, 60, 61, 60, 62, 61] }
+    { name: 'BestBuy', logo: '', items: 342, avgPrice: 842.20, visibilityScore: 74, marketShare: 45, trend: [65, 68, 70, 72, 74, 73, 74] },
+    { name: 'Amazon', logo: '', items: 412, avgPrice: 855.40, visibilityScore: 42, marketShare: 32, trend: [40, 41, 40, 42, 43, 41, 42] },
+    { name: 'Walmart', logo: '', items: 288, avgPrice: 838.00, visibilityScore: 61, marketShare: 23, trend: [58, 59, 60, 61, 60, 62, 61] }
   ];
 
   topProducts: Product[] = [
-    { name: 'Keychron Q1 Max Custom Keyboard', revenue: 42500, margin: 24, image: '', history: [40, 42, 45, 43, 48, 52, 55] },
-    { name: 'Apple iPad Pro 12.9" M2', revenue: 38200, margin: 18, image: '', history: [35, 36, 38, 37, 39, 40, 38] },
-    { name: 'Bose Ultra Headphones', revenue: 29400, margin: 32, image: '', history: [22, 25, 24, 28, 30, 32, 31] },
-    { name: 'Nintendo Switch OLED', revenue: 24100, margin: 12, image: '', history: [18, 19, 21, 20, 22, 23, 24] },
-    { name: 'Logitech Master 3S', revenue: 18600, margin: 45, image: '', history: [12, 14, 15, 17, 18, 19, 20] }
+    { name: 'Keychron Q1 Max Custom Keyboard', popularityScore: 942, visibility: 24, image: '', history: [40, 42, 45, 43, 48, 52, 55] },
+    { name: 'Apple iPad Pro 12.9" M2', popularityScore: 885, visibility: 18, image: '', history: [35, 36, 38, 37, 39, 40, 38] },
+    { name: 'Bose Ultra Headphones', popularityScore: 812, visibility: 32, image: '', history: [22, 25, 24, 28, 30, 32, 31] },
+    { name: 'Nintendo Switch OLED', popularityScore: 760, visibility: 12, image: '', history: [18, 19, 21, 20, 22, 23, 24] },
+    { name: 'Logitech Master 3S', popularityScore: 640, visibility: 45, image: '', history: [12, 14, 15, 17, 18, 19, 20] }
   ];
 
   insights: Insight[] = [
     { type: 'win', title: 'Market Stability Index', message: 'Current price fluctuations are within 95% confidence intervals, indicating statistically significant stability across major categories.', timeAgo: 'LATEST' },
     { type: 'risk', title: 'Sample Size Variance', message: 'The current SKU overlap on Walmart (p=0.08) is below the significance threshold, suggesting trend data may be speculative this period.', timeAgo: 'LATEST' }
+  ];
+
+  priceGapHeatmap = {
+    competitors: ['Newegg', 'BestBuy', 'Jumia', 'PC21'],
+    categories: [
+      { name: 'GPU', gaps: [-89, -12, 45, 110] },
+      { name: 'Laptop', gaps: [-23, -180, 67, 12] },
+      { name: 'RAM', gaps: [8, 14, 22, 31] },
+      { name: 'SSD', gaps: [-15, -8, 18, 24] }
+    ]
+  };
+
+  ttestResults = [
+    { category: 'GPU', myPrice: 1199, marketPrice: 1124, gap: 75, pValue: 0.02, verdict: 'Sig. more expensive', significant: true, expensive: true },
+    { category: 'Laptop', myPrice: 1450, marketPrice: 1471, gap: -21, pValue: 0.31, verdict: 'Not significant', significant: false, expensive: false },
+    { category: 'RAM', myPrice: 84, marketPrice: 91, gap: -7, pValue: 0.04, verdict: 'Sig. cheaper', significant: true, expensive: false },
+    { category: 'SSD', myPrice: 118, marketPrice: 122, gap: -4, pValue: 0.28, verdict: 'Not significant', significant: false, expensive: false }
   ];
 
   constructor(private cdr: ChangeDetectorRef) {}
@@ -916,8 +1130,8 @@ export class BusinessAnalyticsComponent implements OnInit, AfterViewInit, OnDest
     this.chartInstances.forEach(c => { try { c.destroy(); } catch(e) {} });
     this.chartInstances = [];
 
-    this.createRevenueMarginChart(gridColor, borderCol);
-    this.createAvgPriceCategoryChart();
+    this.createGroupedBarChart(gridColor);
+    this.createScatterRegressionChart(gridColor);
     this.createKpiSparklines();
     this.createTableVisuals('#10B981');
     if (this.showStatsModal) this.createModalChart();
@@ -960,108 +1174,143 @@ export class BusinessAnalyticsComponent implements OnInit, AfterViewInit, OnDest
   }
   private modalVarianceCanvas!: ElementRef<HTMLCanvasElement>;
 
-  private createRevenueMarginChart(gridColor: string, borderCol: string) {
-    const ctx = this.revenueMarginCanvas.nativeElement.getContext('2d')!;
-    
-    // Multi-layered Gradient for Revenue Bars
-    const revGradient = ctx.createLinearGradient(0, 0, 0, 400);
-    revGradient.addColorStop(0, 'rgba(37, 99, 235, 0.7)');
-    revGradient.addColorStop(0.5, 'rgba(37, 99, 235, 0.4)');
-    revGradient.addColorStop(1, 'rgba(37, 99, 235, 0.1)');
-
+  private createGroupedBarChart(gridColor: string) {
+    if(!this.groupedBarCanvas) return;
+    const ctx = this.groupedBarCanvas.nativeElement.getContext('2d')!;
     this.chartInstances.push(new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: Array.from({length: 30}, (_, i) => `Mar ${i + 1}`),
+        labels: this.groupedBarData.labels,
         datasets: [
-          {
-            type: 'bar',
-            label: 'Revenue',
-            data: Array.from({length: 30}, () => 7000 + Math.random() * 3000),
-            backgroundColor: revGradient,
-            borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
-            borderSkipped: false,
-            barThickness: 14,
-            yAxisID: 'y',
-            hidden: this.viewMode === 'Margin'
-          },
-          {
-            type: 'line',
-            label: 'Margin %',
-            data: Array.from({length: 30}, () => 32 + Math.random() * 8),
-            borderColor: '#10B981',
-            borderWidth: 3,
-            tension: 0.45,
-            pointRadius: 0,
-            pointHoverRadius: 6,
-            pointBackgroundColor: '#10B981',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            yAxisID: 'y1',
-            hidden: this.viewMode === 'Revenue'
-          }
+          { label: 'Newegg', data: this.groupedBarData.newegg, backgroundColor: '#628DEC', borderRadius: 4, barPercentage: 0.85, categoryPercentage: 0.75 },
+          { label: 'BestBuy', data: this.groupedBarData.bestbuy, backgroundColor: '#E87C53', borderRadius: 4, barPercentage: 0.85, categoryPercentage: 0.75 },
+          { label: 'Jumia', data: this.groupedBarData.jumia, backgroundColor: '#60BC78', borderRadius: 4, barPercentage: 0.85, categoryPercentage: 0.75 }
         ]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
+        responsive: true, maintainAspectRatio: false,
         plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: 'rgba(15, 23, 42, 0.95)',
-            padding: 12,
-            titleFont: { size: 13, weight: 'bold' },
-            bodyFont: { size: 12 },
-            cornerRadius: 10,
-            displayColors: true,
-            callbacks: {
-              label: (context: any) => {
-                let label = context.dataset.label || '';
-                const val = context.parsed.y;
-                if (val === null || val === undefined) return ` ${label}: -`;
-                if (label === 'Revenue') return ` ${label}: $${val.toLocaleString()}`;
-                return ` ${label}: ${val.toFixed(1)}%`;
-              }
-            }
-          }
+          legend: { position: 'top', labels: { boxWidth: 12, padding: 24, font: { weight: 600 } } }
         },
         scales: {
-          x: { 
-            grid: { display: false },
-            ticks: { autoSkip: true, maxTicksLimit: 10, font: { weight: 600 } }
-          },
+          x: { grid: { display: false }, ticks: { font: { weight: 600 } } },
           y: { 
-            position: 'left',
-            grid: { color: gridColor, drawTicks: false },
-            border: { display: false, dash: [4, 4] },
-            ticks: { 
-              padding: 12,
-              callback: v => `$${Number(v) >= 1000 ? (Number(v)/1000).toFixed(0) + 'k' : v}` 
-            } 
-          },
-          y1: { 
-            position: 'right',
-            grid: { display: false },
-            ticks: { 
-              padding: 12,
-              callback: v => v + '%' 
-            } 
+            grid: { color: gridColor },
+            border: { display: false },
+            ticks: { callback: v => '$' + v, font: { weight: 600 } }
           }
         }
       }
     }));
   }
 
-  private createAvgPriceCategoryChart() {
-    this.chartInstances.push(new Chart(this.avgPriceCategoryCanvas.nativeElement, {
-      type: 'doughnut',
+  private createScatterRegressionChart(gridColor: string) {
+    if(!this.scatterRegressionCanvas) return;
+    const ctx = this.scatterRegressionCanvas.nativeElement.getContext('2d')!;
+    
+    // Exact fidelity points mimicking the professional image
+    const scatterData = [
+      {x: 1.0, y: 95}, {x: 1.05, y: 98}, {x: 1.15, y: 118}, {x: 1.2, y: 131}, {x: 1.3, y: 127}, 
+      {x: 1.6, y: 88}, {x: 1.85, y: 78}, {x: 1.9, y: 90}, {x: 1.95, y: 115}, {x: 1.95, y: 128}, 
+      {x: 2.15, y: 79}, {x: 2.25, y: 122}, {x: 2.35, y: 105}, {x: 2.4, y: 104}, {x: 2.75, y: 119}, 
+      {x: 2.75, y: 104}, {x: 2.85, y: 107}, {x: 2.9, y: 78}, {x: 3.3, y: 67}, {x: 3.32, y: 65}, 
+      {x: 3.4, y: 88}, {x: 3.42, y: 94}, {x: 3.8, y: 83}, {x: 3.9, y: 100}, {x: 4.1, y: 59}, 
+      {x: 4.1, y: 74}, {x: 4.2, y: 63}, {x: 4.3, y: 80}, {x: 4.3, y: 65}, {x: 4.6, y: 75}, 
+      {x: 4.8, y: 104}, {x: 4.9, y: 74}
+    ];
+
+    const bandBottom = [ {x: 1.0, y: 85}, {x: 5.0, y: 55} ];
+    const bandTop = [ {x: 1.0, y: 135}, {x: 5.0, y: 105} ];
+    const regressionLine = [ {x: 1.0, y: 110}, {x: 5.0, y: 80} ];
+
+    this.chartInstances.push(new Chart(ctx, {
+      type: 'scatter',
       data: {
-        labels: this.categoryPricing.map(c => c.category),
-        datasets: [{ data: this.categoryPricing.map(c => c.avgPrice), backgroundColor: this.categoryPricing.map(c => c.color), borderWidth: 0 }]
+        datasets: [
+          {
+            type: 'scatter',
+            label: 'Products',
+            data: scatterData,
+            backgroundColor: '#7F93A3',
+            borderColor: '#ffffff',
+            borderWidth: 1.5,
+            pointRadius: 6,
+            pointHoverRadius: 8
+          },
+          {
+             type: 'line',
+             label: 'Lower CF',
+             data: bandBottom,
+             borderColor: 'transparent',
+             backgroundColor: 'rgba(235, 115, 115, 0.18)',
+             borderWidth: 0,
+             pointRadius: 0,
+             fill: 2,
+             tension: 0
+          },
+          {
+             type: 'line',
+             label: 'Upper CF',
+             data: bandTop,
+             borderColor: 'transparent',
+             borderWidth: 0,
+             pointRadius: 0,
+             fill: false,
+             tension: 0
+          },
+          {
+            type: 'line',
+            label: 'Regression',
+            data: regressionLine,
+            borderColor: '#F07C7C',
+            borderWidth: 3,
+            fill: false,
+            pointRadius: 0,
+            tension: 0
+          }
+        ]
       },
-      options: { cutout: '82%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { 
+            type: 'linear', position: 'bottom', min: 1.0, max: 5.0,
+            grid: { display: false }, border: { display: false },
+            ticks: { stepSize: 1, font: { weight: 600 }, padding: 10 }
+          },
+          y: { 
+            min: 40, max: 160,
+            grid: { color: gridColor }, border: { display: false },
+            ticks: { stepSize: 20, font: { weight: 600 }, padding: 10 },
+            title: { display: true, text: '↑ Price (USD)', color: 'var(--text-muted)', font: { weight: 600 }, padding: 12 }
+          }
+        }
+      }
     }));
+  }
+
+  getStdDevColor(val: number) {
+    if (val > 150) return 'var(--danger)';
+    if (val > 50) return '#F59E0B'; // amber
+    return 'var(--success)';
+  }
+
+  getProdCorrelationBg(val: number) {
+     if (val === 1) return '#1A1A1A'; // very dark
+     if (val > 0.5) return '#EAF1FF'; // light blue
+     if (val < -0.3) return '#FCEBEB'; // light red
+     if (val < 0) return '#FFF8DF'; // light yellow
+     return '#ffffff';
+  }
+
+  getProdCorrelationText(val: number) {
+     const isLight = document.documentElement.classList.contains('light-mode');
+     if (val === 1) return '#ffffff';
+     if (val > 0.5) return '#2563EB'; // blue text
+     if (val < -0.3) return '#DC2626'; // red text
+     if (val < 0) return '#D97706'; // amber/yellow text
+     return '#000000';
   }
 
   private createKpiSparklines() {
@@ -1098,7 +1347,35 @@ export class BusinessAnalyticsComponent implements OnInit, AfterViewInit, OnDest
     return '#3B82F6';
   }
 
-  updateViewMode(mode: 'Revenue' | 'Margin' | 'Both') { this.viewMode = mode; this.initAllCharts(); }
+  getHeatmapColor(gap: number) {
+    const absGap = Math.abs(gap);
+    if (gap === 0) return 'rgba(168, 162, 158, 0.08)'; // Warm stone
+    
+    const maxVal = 150; 
+    const ratio = Math.min(absGap / maxVal, 1);
+    
+    if (gap > 0) {
+      // Elegant warm Sage
+      return `rgba(91, 157, 112, ${0.08 + ratio * 0.18})`;
+    } else {
+      // Elegant warm Terracotta
+      return `rgba(216, 106, 88, ${0.08 + ratio * 0.18})`;
+    }
+  }
+
+  getHeatmapTextColor(gap: number) {
+    if (gap === 0) return 'var(--text-muted)';
+    if (gap > 0) return '#539665'; // Warm Sage
+    return '#CE6351'; // Warm Terracotta
+  }
+
+  getHeatmapDotColor(gap: number) {
+    if (gap === 0) return 'rgba(168, 162, 158, 0.6)';
+    if (gap > 0) return '#5B9D70'; // Slightly brighter for the glow dot
+    return '#D86A58';
+  }
+
+  updateViewMode(mode: 'Price' | 'Stock' | 'Both') { this.viewMode = mode; this.initAllCharts(); }
   
   onRangeChange(range: string) {
     this.activeRange = range;
@@ -1117,7 +1394,7 @@ export class BusinessAnalyticsComponent implements OnInit, AfterViewInit, OnDest
     }, 1500);
   }
 
-  getWinRateColorByValue(val: number) { return val >= 70 ? '#10B981' : (val >= 50 ? '#F59E0B' : '#EF4444'); }
+  getScoreColorByValue(val: number) { return val >= 70 ? '#10B981' : (val >= 50 ? '#F59E0B' : '#EF4444'); }
   getMarginClass(val: number) { return val >= 30 ? 'high' : (val >= 15 ? 'mid' : 'low'); }
   getInsightColor(type: string) { return type === 'win' ? '#10B981' : (type === 'risk' ? '#EF4444' : '#F59E0B'); }
 

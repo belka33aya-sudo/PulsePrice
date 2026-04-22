@@ -41,8 +41,8 @@ interface CompDetail { seller: string; logo: string; price: number; stock: strin
           <div class="ph-info">
             <div class="ph-tags">
               <span class="ph-cat">{{ product.category }}</span>
-              <span class="status-badge" [ngClass]="product.status">
-                <span class="s-dot"></span> {{ product.status | titlecase }} Margin
+              <span class="status-badge healthy">
+                <span class="s-dot"></span> TOP RANKED
               </span>
             </div>
             <h1 class="ph-title">{{ product.name }}</h1>
@@ -57,10 +57,9 @@ interface CompDetail { seller: string; logo: string; price: number; stock: strin
                 <span class="sc-val comp" [class.danger]="product.lowestComp < product.yourPrice">{{ product.lowestComp | currency }}</span>
               </div>
               <div class="stat-card">
-                <span class="sc-label">Est. Margin</span>
+                <span class="sc-label">Stock Status</span>
                 <div class="sc-margin">
-                  <span class="sc-val" [style.color]="getMarginColor()">{{ product.margin }}%</span>
-                  <div class="margin-bar"><div class="mb-fill" [style.width.%]="product.margin" [style.background]="getMarginColor()"></div></div>
+                  <span class="sc-val" style="color: #10B981">In Stock</span>
                 </div>
               </div>
             </div>
@@ -117,7 +116,7 @@ interface CompDetail { seller: string; logo: string; price: number; stock: strin
                 <span class="sg-val">Low</span>
               </div>
             </div>
-            <div class="sg-card">
+             <div class="sg-card">
               <span class="sg-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px; color:var(--accent-blue)">
                   <circle cx="12" cy="8" r="7"></circle>
@@ -125,8 +124,8 @@ interface CompDetail { seller: string; logo: string; price: number; stock: strin
                 </svg>
               </span>
               <div class="sg-data">
-                <span class="sg-lbl">Win Rate</span>
-                <span class="sg-val">84%</span>
+                <span class="sg-lbl">Price Rank</span>
+                <span class="sg-val">#{{ product.rank }}</span>
               </div>
             </div>
             <div class="sg-card">
@@ -137,8 +136,8 @@ interface CompDetail { seller: string; logo: string; price: number; stock: strin
                 </svg>
               </span>
               <div class="sg-data">
-                <span class="sg-lbl">Total Reveune</span>
-                <span class="sg-val">$12,450</span>
+                <span class="sg-lbl">Market Visibility</span>
+                <span class="sg-val">84%</span>
               </div>
             </div>
           </div>
@@ -231,8 +230,8 @@ interface CompDetail { seller: string; logo: string; price: number; stock: strin
             
             <div class="impact-grid">
               <div class="impact-item">
-                <span class="impact-lbl">New Margin</span>
-                <span class="impact-val" [style.color]="getNewMarginColor()">{{ calculateNewMargin() }}%</span>
+                <span class="impact-lbl">New Market Position</span>
+                <span class="impact-val" [class.positive]="calculateNewGap() <= 0">{{ calculateNewGap() <= 0 ? 'Leader' : 'follower' }}</span>
               </div>
               <div class="impact-item">
                 <span class="impact-lbl">Market Gap</span>
@@ -240,13 +239,8 @@ interface CompDetail { seller: string; logo: string; price: number; stock: strin
               </div>
             </div>
 
-            <div class="impact-bar-wrap">
-              <div class="impact-bar-track">
-                <div class="impact-bar-fill" [style.width.%]="calculateNewMargin()" [style.background]="getNewMarginColor()"></div>
-              </div>
-            </div>
-            <p class="impact-note" *ngIf="newPrice < product.lowestComp">
-              ✨ This price will win the Buy Box.
+            <p class="impact-note" *ngIf="newPrice <= product.lowestComp">
+              ✨ This price will lead the market.
             </p>
           </div>
 

@@ -66,7 +66,7 @@ import { PLATFORM_PRODUCT_LIBRARY } from '../../core/constants/product-library';
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
               </svg>
-              <span>Margin Alerts</span>
+              <span>Pricing Alerts</span>
               <span class="nav-badge risk">3</span>
             </a>
           </div>
@@ -105,7 +105,7 @@ import { PLATFORM_PRODUCT_LIBRARY } from '../../core/constants/product-library';
             </svg>
           </div>
           <div class="rb-text">
-            <span class="rb-title">3 margins at risk</span>
+            <span class="rb-title">3 prices uncompetitive</span>
             <a routerLink="/business/alerts" class="rb-action">Review now →</a>
           </div>
         </div>
@@ -479,7 +479,7 @@ export class EntrepreneurDashboardComponent implements OnInit {
 
   notifications = [
     { id: 1, type: 'price_drop', message: 'BestBuy dropped prices on 12 overlapping items.', time: '2 hours ago', read: false },
-    { id: 2, type: 'alert_close', message: 'Margin risk detected for iPhone 15 Pro — below 15% threshold.', time: '3 hours ago', read: false },
+    { id: 2, type: 'alert_close', message: 'Pricing risk detected for iPhone 15 Pro — currently #4 in market.', time: '3 hours ago', read: false },
     { id: 3, type: 'price_drop', message: 'Amazon matched your catalog pricing for Sony XM5.', time: '5 hours ago', read: true },
   ];
 
@@ -525,7 +525,7 @@ export class EntrepreneurDashboardComponent implements OnInit {
       const s = r?.snapshot.url[0]?.path || '';
       const m: Record<string, string> = {
         catalog: 'Catalog Tracker', competitors: 'Competitor Scanner',
-        alerts: 'Margin Alerts', analytics: 'Analytics', settings: 'Settings'
+        alerts: 'Pricing Alerts', analytics: 'Analytics', settings: 'Settings'
       };
       return m[s] || 'Business Overview';
     })
