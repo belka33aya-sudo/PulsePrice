@@ -1,0 +1,17 @@
+# Python specific
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables
+.env
+
+# Migration files (ignoring compiled bytecode)
+alembic/versions/*.pyc

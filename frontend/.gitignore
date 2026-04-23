@@ -1,0 +1,22 @@
+# Dependency directories
+node_modules/
+
+# Angular build output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Angular cache
+.angular/
+
+# Local environment variables
+.env
