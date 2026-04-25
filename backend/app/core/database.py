@@ -9,7 +9,3 @@ engine = create_async_engine(DATABASE_URL, echo=True)
 AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 Base = declarative_base()
 
-# Dépendance pour FastAPI
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session

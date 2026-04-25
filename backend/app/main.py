@@ -1,7 +1,11 @@
 from fastapi import FastAPI
+from app.api.v1.endpoints import auth # Import de nouveau fichier
 
-app = FastAPI(title="PulsePrice API", version="1.0.0")
+app = FastAPI(title="PulsePrice API")
+
+# On branche le module d'authentification
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 
 @app.get("/health")
-def health():
-    return {"status": "ok"}
+async def health():
+    return "OK"
